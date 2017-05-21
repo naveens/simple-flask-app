@@ -1,0 +1,36 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: simple-flask-app
+  labels:
+    app: simple-flask-app
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: simple-flask-app
+    spec:
+      containers:
+      - name: simple-flask-app
+        image: naveensi/simple-flask-app
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+        ports:
+        - containerPort: 5000
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: simple-flask-app
+spec:
+  type: NodePort
+  selector:
+    app: simple-flask-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
